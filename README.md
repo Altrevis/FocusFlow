@@ -1,20 +1,20 @@
 # FocusFlow
 
-Application mobile Flutter de gestion de concentration et de productivité basée sur la méthode Pomodoro.
+Application mobile Flutter — le compagnon du développeur au quotidien.
 
 ---
 
 # Présentation
 
-FocusFlow est une application pensée pour les étudiants, développeurs et freelances souhaitant améliorer leur concentration pendant leurs sessions de travail.
+FocusFlow est une application pensée pour les développeurs de tous niveaux (junior à senior) souhaitant centraliser leurs ressources, suivre leur progression et gérer leurs problèmes techniques au quotidien.
 
-L’objectif du projet est de proposer une expérience moderne, fluide et minimaliste permettant de :
+L'objectif du projet est de proposer une expérience moderne, fluide et minimaliste permettant de :
 
-* lancer des sessions de concentration
-* suivre sa productivité
-* consulter ses statistiques
-* sauvegarder ses données localement
+* consulter des cheatsheets et snippets de code rapidement
+* tenir un journal d'apprentissage quotidien
+* sauvegarder et retrouver ses solutions de bugs
 * fonctionner même hors-ligne
+* suivre sa progression dans le temps
 
 Le projet a été conçu comme un prototype réaliste pouvant être publié sur les stores mobiles.
 
@@ -24,29 +24,38 @@ Le projet a été conçu comme un prototype réaliste pouvant être publié sur 
 
 ## Home Screen
 
-* Affichage des statistiques du jour
-* Citation motivationnelle via API REST
-* Accès rapide à une session de concentration
+* Résumé de l'activité récente (logs, bugs résolus)
+* Citation / tip dev du jour via API REST
+* Accès rapide aux 3 modules principaux
 
-## Focus Screen
+## Ref Screen (Références & Cheatsheets)
 
-* Timer Pomodoro
-* Start / Pause / Reset
-* Animation circulaire
-* Affichage du temps restant
+* Bibliothèque de cheatsheets organisées par technologie (Git, SQL, Regex, Terminal, Flutter...)
+* Snippets de code avec coloration syntaxique
+* Recherche rapide par mot-clé ou tag
+* Contenu disponible offline (stocké localement)
+* Favoris pour accès ultra-rapide
 
-## Stats Screen
+## Log Screen (Journal d'apprentissage)
 
-* Temps total travaillé
-* Nombre de sessions réalisées
-* Historique des sessions
-* Graphiques de progression
+* Création d'entrées quotidiennes : ce que j'ai appris aujourd'hui
+* Tagging par technologie / langage
+* Historique navigable avec recherche
+* Graphique de progression (régularité d'apprentissage)
+* Streak journalier pour encourager la constance
+
+## Bugs Screen (Base de solutions personnelle)
+
+* Saisie d'un bug rencontré : titre, contexte, solution trouvée
+* Tags par langage / framework
+* Recherche full-text dans ses propres solutions
+* Ne plus chercher deux fois la même chose
 
 ## Settings Screen
 
 * Mode sombre
-* Personnalisation du temps des sessions
 * Réinitialisation des données locales
+* Gestion des technologies favorites (filtre d'affichage)
 
 ---
 
@@ -106,8 +115,9 @@ Le projet utilise Riverpod pour :
 
 Exemple :
 
-* `sessionProvider`
-* `statsProvider`
+* `refProvider`
+* `logProvider`
+* `bugProvider`
 * `quoteProvider`
 * `themeProvider`
 
@@ -115,14 +125,14 @@ Exemple :
 
 # Gestion réseau
 
-L’application consomme une API REST afin de récupérer des citations motivationnelles affichées sur l’écran d’accueil.
+L'application consomme une API REST afin de récupérer des tips et citations dev affichés sur l'écran d'accueil.
 
 Fonctionnalités mises en place :
 
 * requêtes HTTP avec Dio
 * gestion des erreurs réseau
 * sérialisation JSON
-* fallback hors-ligne
+* fallback hors-ligne sur contenu local
 
 ---
 
@@ -132,10 +142,10 @@ Les données utilisateur sont sauvegardées localement grâce à Hive.
 
 Données stockées :
 
-* sessions de travail
-* statistiques utilisateur
-* préférences de thème
-* durée des sessions
+* cheatsheets et snippets (Ref Screen)
+* entrées du journal d'apprentissage (Log Screen)
+* bugs et solutions (Bugs Screen)
+* préférences de thème et technologies favorites
 
 L’application reste utilisable sans connexion internet.
 
@@ -164,7 +174,7 @@ Le design s’inspire des applications modernes comme :
 
 * Notion
 * Linear
-* Headspace
+* GitHub
 
 Objectifs :
 
