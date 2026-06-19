@@ -54,8 +54,17 @@ Le projet a été conçu comme un prototype réaliste pouvant être publié sur 
 ## Settings Screen
 
 * Mode sombre
+* Saisie et sauvegarde de la clé API YouTube Data v3
 * Réinitialisation des données locales
 * Gestion des technologies favorites (filtre d'affichage)
+
+## Courses Screen (Shorts YouTube)
+
+* Filtres par tag : Flutter, JavaScript, Python, React, TypeScript, CSS, Node.js, Git, Docker, Linux, Backend, Frontend, DevOps
+* Grille de vidéos YouTube Shorts via l'API YouTube Data v3
+* Ouverture dans le navigateur via url_launcher
+* Écran d'onboarding si aucune clé API n'est configurée (instructions pas à pas)
+* Gestion des erreurs (clé invalide, quota dépassé, hors-ligne)
 
 ---
 
@@ -100,7 +109,8 @@ Structure :
 | Hive         | Persistance locale      |
 | GoRouter     | Navigation              |
 | fl_chart     | Statistiques graphiques |
-| Google Fonts | Typographie moderne     |
+| url_launcher | Ouverture des vidéos YouTube  |
+| Google Fonts | Typographie moderne           |
 
 ---
 
@@ -125,9 +135,22 @@ Exemple :
 
 # Gestion réseau
 
-L'application consomme une API REST afin de récupérer des tips et citations dev affichés sur l'écran d'accueil.
+L'application consomme deux API REST.
 
-Fonctionnalités mises en place :
+## Quotable API
+
+* Endpoint : `https://api.quotable.io/quotes/random?tags=technology`
+* Retourne des citations de personnages tech/programmation
+* Fallback local (8 citations) si inaccessible
+
+## YouTube Data API v3
+
+* Endpoint : `https://www.googleapis.com/youtube/v3/search`
+* Recherche de Shorts par tag (Flutter, JavaScript, Python...)
+* Nécessite une clé API personnelle (configurable dans les paramètres)
+* Gestion des états : chargement, erreur, quota dépassé, hors-ligne
+
+Fonctionnalités communes :
 
 * requêtes HTTP avec Dio
 * gestion des erreurs réseau
