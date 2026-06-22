@@ -109,8 +109,7 @@ class LogScreen extends ConsumerWidget {
                           const SizedBox(height: 8),
                           Text(
                             entry.content,
-                            style: const TextStyle(
-                                color: AppColors.text, height: 1.5),
+                            style: const TextStyle(height: 1.5),
                           ),
                           if (entry.tags.isNotEmpty) ...[
                             const SizedBox(height: 8),

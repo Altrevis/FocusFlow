@@ -110,7 +110,6 @@ class _BugsScreenState extends ConsumerState<BugsScreen> {
                             title: Text(
                               bug.title,
                               style: const TextStyle(
-                                  color: AppColors.text,
                                   fontWeight: FontWeight.w600),
                             ),
                             subtitle: Padding(
@@ -133,7 +132,6 @@ class _BugsScreenState extends ConsumerState<BugsScreen> {
                                 _SectionLabel(label: 'Contexte'),
                                 Text(bug.context,
                                     style: const TextStyle(
-                                        color: AppColors.text,
                                         fontSize: 13,
                                         height: 1.5)),
                                 const SizedBox(height: 10),
@@ -152,7 +150,7 @@ class _BugsScreenState extends ConsumerState<BugsScreen> {
                                 child: Text(
                                   bug.solution,
                                   style: const TextStyle(
-                                      color: AppColors.text,
+
                                       fontSize: 13,
                                       height: 1.5),
                                 ),

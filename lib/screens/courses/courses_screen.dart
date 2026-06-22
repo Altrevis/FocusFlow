@@ -131,9 +131,9 @@ class _VideoCard extends StatelessWidget {
       onTap: _open,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -201,7 +201,6 @@ class _VideoCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: AppColors.text,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         height: 1.3,
@@ -242,7 +241,6 @@ class _NoApiKeyPlaceholder extends StatelessWidget {
             const Text(
               'Clé API YouTube requise',
               style: TextStyle(
-                color: AppColors.text,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -319,8 +317,7 @@ class _Step extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(text,
-                style: const TextStyle(
-                    color: AppColors.text, fontSize: 13)),
+                style: const TextStyle(fontSize: 13)),
           ),
         ],
       ),

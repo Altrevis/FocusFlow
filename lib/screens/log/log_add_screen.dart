@@ -62,10 +62,7 @@ class _LogAddScreenState extends ConsumerState<LogAddScreen> {
           children: [
             Text(
               "Qu'as-tu appris aujourd'hui ?",
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(color: AppColors.text),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
             Expanded(
@@ -74,7 +71,6 @@ class _LogAddScreenState extends ConsumerState<LogAddScreen> {
                 maxLines: null,
                 expands: true,
                 textAlignVertical: TextAlignVertical.top,
-                style: const TextStyle(color: AppColors.text),
                 decoration: const InputDecoration(
                   hintText:
                       'Décris ce que tu as appris, une astuce, une commande...',
@@ -95,7 +91,6 @@ class _LogAddScreenState extends ConsumerState<LogAddScreen> {
                   child: TextField(
                     controller: _tagController,
                     onSubmitted: _addTag,
-                    style: const TextStyle(color: AppColors.text),
                     decoration: const InputDecoration(
                       hintText: 'Ajouter un tag (ex: flutter, git...)',
                       contentPadding:
@@ -119,12 +114,9 @@ class _LogAddScreenState extends ConsumerState<LogAddScreen> {
                     .map(
                       (t) => Chip(
                         label: Text(t,
-                            style: const TextStyle(
-                                fontSize: 12, color: AppColors.text)),
+                            style: const TextStyle(fontSize: 12)),
                         deleteIcon: const Icon(Icons.close, size: 14),
                         onDeleted: () => setState(() => _tags.remove(t)),
-                        backgroundColor: AppColors.card,
-                        side: const BorderSide(color: AppColors.border),
                       ),
                     )
                     .toList(),

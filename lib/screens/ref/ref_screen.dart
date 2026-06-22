@@ -95,7 +95,6 @@ class _RefScreenState extends ConsumerState<RefScreen> {
                           title: Text(
                             sheet.title,
                             style: const TextStyle(
-                                color: AppColors.text,
                                 fontWeight: FontWeight.w600),
                           ),
                           subtitle: Padding(

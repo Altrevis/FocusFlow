@@ -42,10 +42,7 @@ class HomeScreen extends ConsumerWidget {
           // Greeting
           Text(
             '${_greeting()}, développeur 👋',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(color: AppColors.text),
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 4),
           Text(
@@ -94,7 +91,7 @@ class HomeScreen extends ConsumerWidget {
             style: Theme.of(context)
                 .textTheme
                 .titleMedium
-                ?.copyWith(color: AppColors.text, fontWeight: FontWeight.bold),
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           Row(
@@ -129,7 +126,6 @@ class HomeScreen extends ConsumerWidget {
             Text(
               'Derniers apprentissages',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.text,
                     fontWeight: FontWeight.bold,
                   ),
             ),
@@ -144,8 +140,7 @@ class HomeScreen extends ConsumerWidget {
                         e.content.length > 80
                             ? '${e.content.substring(0, 80)}...'
                             : e.content,
-                        style:
-                            const TextStyle(color: AppColors.text, fontSize: 13),
+                        style: const TextStyle(fontSize: 13),
                       ),
                       subtitle: Text(
                         DateFormat('dd/MM/yyyy').format(e.date),
@@ -164,7 +159,6 @@ class HomeScreen extends ConsumerWidget {
             Text(
               'Derniers bugs résolus',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.text,
                     fontWeight: FontWeight.bold,
                   ),
             ),
@@ -177,8 +171,7 @@ class HomeScreen extends ConsumerWidget {
                           color: AppColors.error),
                       title: Text(
                         e.title,
-                        style:
-                            const TextStyle(color: AppColors.text, fontSize: 13),
+                        style: const TextStyle(fontSize: 13),
                       ),
                       subtitle: Text(
                         e.technology,
@@ -248,7 +241,7 @@ class _TipCard extends StatelessWidget {
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium
-                    ?.copyWith(color: AppColors.text, height: 1.5),
+                    ?.copyWith(height: 1.5),
               ),
               const SizedBox(height: 8),
               Text(

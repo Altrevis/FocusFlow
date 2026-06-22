@@ -64,13 +64,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _SectionHeader(label: 'Apparence'),
           Card(
             child: SwitchListTile(
-              title: const Text('Mode sombre',
-                  style: TextStyle(color: AppColors.text)),
+              title: const Text('Mode sombre'),
               subtitle: const Text('Interface sombre pour le confort visuel',
                   style: TextStyle(
                       color: AppColors.textSecondary, fontSize: 12)),
               value: isDark,
-              activeThumbColor: AppColors.primary,
               onChanged: (_) => ref.read(themeProvider.notifier).toggle(),
               secondary: Icon(
                 isDark ? Icons.dark_mode : Icons.light_mode,
@@ -91,8 +89,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   const Text(
                     'Clé API YouTube Data v3',
-                    style: TextStyle(
-                        color: AppColors.text, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4),
                   const Text(
@@ -107,8 +104,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         child: TextField(
                           controller: _apiKeyController,
                           obscureText: !_apiKeyVisible,
-                          style: const TextStyle(
-                              color: AppColors.text, fontSize: 13),
                           decoration: InputDecoration(
                             hintText: 'AIza...',
                             contentPadding: const EdgeInsets.symmetric(
@@ -153,21 +148,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ListTile(
                   leading: const Icon(Icons.storage,
                       color: AppColors.textSecondary),
-                  title: const Text('Logs enregistrés',
-                      style: TextStyle(color: AppColors.text)),
+                  title: const Text('Logs enregistrés'),
                   trailing: Text('$logCount',
                       style: const TextStyle(color: AppColors.textSecondary)),
                 ),
-                const Divider(height: 1, color: AppColors.border),
+                const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.bug_report,
                       color: AppColors.textSecondary),
-                  title: const Text('Bugs enregistrés',
-                      style: TextStyle(color: AppColors.text)),
+                  title: const Text('Bugs enregistrés'),
                   trailing: Text('$bugCount',
                       style: const TextStyle(color: AppColors.textSecondary)),
                 ),
-                const Divider(height: 1, color: AppColors.border),
+                const Divider(height: 1),
                 ListTile(
                   leading:
                       const Icon(Icons.delete_outline, color: AppColors.error),
@@ -193,16 +186,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ListTile(
                   leading: Icon(Icons.info_outline,
                       color: AppColors.textSecondary),
-                  title: Text('Version',
-                      style: TextStyle(color: AppColors.text)),
+                  title: Text('Version'),
                   trailing: Text('1.0.0',
                       style: TextStyle(color: AppColors.textSecondary)),
                 ),
-                Divider(height: 1, color: AppColors.border),
+                Divider(height: 1),
                 ListTile(
                   leading: Icon(Icons.code, color: AppColors.textSecondary),
-                  title: Text('FocusFlow',
-                      style: TextStyle(color: AppColors.text)),
+                  title: Text('FocusFlow'),
                   subtitle: Text('Le compagnon du développeur au quotidien',
                       style: TextStyle(
                           color: AppColors.textSecondary, fontSize: 12)),
@@ -219,9 +210,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: const Text('Réinitialiser les données',
-            style: TextStyle(color: AppColors.text)),
+        title: const Text('Réinitialiser les données'),
         content: const Text(
           'Tous tes logs et bugs enregistrés seront supprimés. Cette action est irréversible.',
           style: TextStyle(color: AppColors.textSecondary),

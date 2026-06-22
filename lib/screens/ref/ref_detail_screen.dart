@@ -57,7 +57,6 @@ class RefDetailScreen extends ConsumerWidget {
             Text(
               sheet.title,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.text,
                     fontWeight: FontWeight.bold,
                   ),
             ),
@@ -125,7 +124,7 @@ class _ContentRenderer extends StatelessWidget {
       } else {
         widgets.add(Text(
           line,
-          style: const TextStyle(color: AppColors.text, height: 1.6),
+          style: const TextStyle(height: 1.6),
         ));
       }
     }

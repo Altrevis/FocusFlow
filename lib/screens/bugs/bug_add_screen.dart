@@ -84,7 +84,6 @@ class _BugAddScreenState extends ConsumerState<BugAddScreen> {
             _FieldLabel(label: 'Titre du bug *'),
             TextField(
               controller: _titleController,
-              style: const TextStyle(color: AppColors.text),
               decoration: const InputDecoration(
                 hintText: 'Ex: NullPointerException au démarrage...',
               ),
@@ -94,7 +93,6 @@ class _BugAddScreenState extends ConsumerState<BugAddScreen> {
             _FieldLabel(label: 'Technologie *'),
             TextField(
               controller: _techController,
-              style: const TextStyle(color: AppColors.text),
               decoration: const InputDecoration(
                 hintText: 'Ex: Flutter, Django, React...',
               ),
@@ -105,7 +103,6 @@ class _BugAddScreenState extends ConsumerState<BugAddScreen> {
             TextField(
               controller: _contextController,
               maxLines: 3,
-              style: const TextStyle(color: AppColors.text),
               decoration: const InputDecoration(
                 hintText: 'Décris le contexte du bug...',
                 contentPadding: EdgeInsets.all(12),
@@ -117,7 +114,6 @@ class _BugAddScreenState extends ConsumerState<BugAddScreen> {
             TextField(
               controller: _solutionController,
               maxLines: 4,
-              style: const TextStyle(color: AppColors.text),
               decoration: const InputDecoration(
                 hintText: 'Comment as-tu résolu ce bug ?',
                 contentPadding: EdgeInsets.all(12),
@@ -132,7 +128,6 @@ class _BugAddScreenState extends ConsumerState<BugAddScreen> {
                   child: TextField(
                     controller: _tagController,
                     onSubmitted: _addTag,
-                    style: const TextStyle(color: AppColors.text),
                     decoration: const InputDecoration(
                       hintText: 'Ajouter un tag...',
                       contentPadding:
@@ -156,12 +151,9 @@ class _BugAddScreenState extends ConsumerState<BugAddScreen> {
                     .map(
                       (t) => Chip(
                         label: Text(t,
-                            style: const TextStyle(
-                                fontSize: 12, color: AppColors.text)),
+                            style: const TextStyle(fontSize: 12)),
                         deleteIcon: const Icon(Icons.close, size: 14),
                         onDeleted: () => setState(() => _tags.remove(t)),
-                        backgroundColor: AppColors.card,
-                        side: const BorderSide(color: AppColors.border),
                       ),
                     )
                     .toList(),
