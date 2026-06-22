@@ -101,16 +101,18 @@ Structure :
 
 # Technologies utilisées
 
-| Technologie  | Utilisation             |
-| ------------ | ----------------------- |
-| Flutter      | Développement mobile    |
-| Riverpod     | State management        |
-| Dio          | Appels API REST         |
-| Hive         | Persistance locale      |
-| GoRouter     | Navigation              |
-| fl_chart     | Statistiques graphiques |
+------------------------------------------------
+| Technologie  | Utilisation                   |
+| ------------ | ------------------------------|
+| Flutter      | Développement mobile          |
+| Riverpod     | State management              |
+| Dio          | Appels API REST               |
+| Hive         | Persistance locale            |
+| GoRouter     | Navigation                    |
+| fl_chart     | Statistiques graphiques       |
 | url_launcher | Ouverture des vidéos YouTube  |
 | Google Fonts | Typographie moderne           |
+------------------------------------------------
 
 ---
 
