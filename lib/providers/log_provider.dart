@@ -6,13 +6,25 @@ import '../models/log_entry.dart';
 class LogState {
   final List<LogEntry> entries;
   final int streak;
+  final String searchQuery;
 
-  const LogState({required this.entries, this.streak = 0});
+  const LogState({required this.entries, this.streak = 0, this.searchQuery = ''});
 
-  LogState copyWith({List<LogEntry>? entries, int? streak}) =>
+  List<LogEntry> get filtered {
+    if (searchQuery.isEmpty) return entries;
+    final q = searchQuery.toLowerCase();
+    return entries
+        .where((e) =>
+            e.content.toLowerCase().contains(q) ||
+            e.tags.any((t) => t.toLowerCase().contains(q)))
+        .toList();
+  }
+
+  LogState copyWith({List<LogEntry>? entries, int? streak, String? searchQuery}) =>
       LogState(
         entries: entries ?? this.entries,
         streak: streak ?? this.streak,
+        searchQuery: searchQuery ?? this.searchQuery,
       );
 }
 
@@ -59,6 +71,10 @@ class LogNotifier extends StateNotifier<LogState> {
       }
     }
     return streak;
+  }
+
+  void setSearch(String query) {
+    state = state.copyWith(searchQuery: query);
   }
 
   Future<void> addEntry(String content, List<String> tags) async {
