@@ -68,6 +68,30 @@ class BugNotifier extends StateNotifier<BugState> {
     state = state.copyWith(entries: [entry, ...state.entries]);
   }
 
+  Future<void> updateEntry({
+    required String id,
+    required String title,
+    required String context,
+    required String solution,
+    required List<String> tags,
+    required String technology,
+  }) async {
+    final existing = state.entries.firstWhere((e) => e.id == id);
+    final updated = BugEntry(
+      id: id,
+      title: title,
+      context: context,
+      solution: solution,
+      tags: tags,
+      technology: technology,
+      date: existing.date,
+    );
+    await HiveService.bugs.put(id, updated.toMap());
+    state = state.copyWith(
+      entries: state.entries.map((e) => e.id == id ? updated : e).toList(),
+    );
+  }
+
   Future<void> deleteEntry(String id) async {
     await HiveService.bugs.delete(id);
     state =

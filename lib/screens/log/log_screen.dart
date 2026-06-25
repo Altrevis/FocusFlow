@@ -157,6 +157,57 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                                         .toList(),
                                   ),
                                 ],
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    OutlinedButton.icon(
+                                      onPressed: () => context
+                                          .push('/log/edit/${entry.id}'),
+                                      icon: const Icon(Icons.edit, size: 16),
+                                      label: const Text('Modifier'),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                          foregroundColor: AppColors.error),
+                                      onPressed: () async {
+                                        final confirm = await showDialog<bool>(
+                                          context: context,
+                                          builder: (_) => AlertDialog(
+                                            title:
+                                                const Text('Supprimer ce log ?'),
+                                            content: const Text(
+                                                'Cette action est irréversible.'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(
+                                                    context, false),
+                                                child: const Text('Annuler'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(
+                                                    context, true),
+                                                child: const Text('Supprimer',
+                                                    style: TextStyle(
+                                                        color: AppColors.error)),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                        if (confirm == true &&
+                                            context.mounted) {
+                                          ref
+                                              .read(logProvider.notifier)
+                                              .deleteEntry(entry.id);
+                                        }
+                                      },
+                                      icon: const Icon(Icons.delete_outline,
+                                          size: 16),
+                                      label: const Text('Supprimer'),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),

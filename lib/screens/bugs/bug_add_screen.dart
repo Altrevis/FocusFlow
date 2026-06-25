@@ -5,7 +5,8 @@ import '../../core/constants/app_colors.dart';
 import '../../providers/bug_provider.dart';
 
 class BugAddScreen extends ConsumerStatefulWidget {
-  const BugAddScreen({super.key});
+  final String? editId;
+  const BugAddScreen({super.key, this.editId});
 
   @override
   ConsumerState<BugAddScreen> createState() => _BugAddScreenState();
@@ -19,6 +20,22 @@ class _BugAddScreenState extends ConsumerState<BugAddScreen> {
   final _tagController = TextEditingController();
   final List<String> _tags = [];
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.editId != null) {
+      final entry = ref
+          .read(bugProvider)
+          .entries
+          .firstWhere((e) => e.id == widget.editId);
+      _titleController.text = entry.title;
+      _contextController.text = entry.context;
+      _solutionController.text = entry.solution;
+      _techController.text = entry.technology;
+      _tags.addAll(entry.tags);
+    }
+  }
 
   @override
   void dispose() {
@@ -52,13 +69,24 @@ class _BugAddScreenState extends ConsumerState<BugAddScreen> {
     }
 
     setState(() => _saving = true);
-    await ref.read(bugProvider.notifier).addEntry(
-          title: title,
-          context: _contextController.text.trim(),
-          solution: solution,
-          tags: _tags,
-          technology: tech,
-        );
+    if (widget.editId != null) {
+      await ref.read(bugProvider.notifier).updateEntry(
+            id: widget.editId!,
+            title: title,
+            context: _contextController.text.trim(),
+            solution: solution,
+            tags: _tags,
+            technology: tech,
+          );
+    } else {
+      await ref.read(bugProvider.notifier).addEntry(
+            title: title,
+            context: _contextController.text.trim(),
+            solution: solution,
+            tags: _tags,
+            technology: tech,
+          );
+    }
     if (mounted) context.pop();
   }
 
@@ -66,8 +94,9 @@ class _BugAddScreenState extends ConsumerState<BugAddScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nouveau bug',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+            widget.editId != null ? 'Modifier le bug' : 'Nouveau bug',
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           TextButton(
             onPressed: _saving ? null : _save,

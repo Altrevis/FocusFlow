@@ -89,6 +89,19 @@ class LogNotifier extends StateNotifier<LogState> {
     state = LogState(entries: updated, streak: _calcStreak(updated));
   }
 
+  Future<void> updateEntry(String id, String content, List<String> tags) async {
+    final existing = state.entries.firstWhere((e) => e.id == id);
+    final updated = LogEntry(
+      id: id,
+      date: existing.date,
+      content: content,
+      tags: tags,
+    );
+    await HiveService.logs.put(id, updated.toMap());
+    final entries = state.entries.map((e) => e.id == id ? updated : e).toList();
+    state = LogState(entries: entries, streak: _calcStreak(entries));
+  }
+
   Future<void> deleteEntry(String id) async {
     await HiveService.logs.delete(id);
     final updated = state.entries.where((e) => e.id != id).toList();

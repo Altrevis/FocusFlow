@@ -48,8 +48,18 @@ final appRouter = GoRouter(
       builder: (context, state) => const LogAddScreen(),
     ),
     GoRoute(
+      path: '/log/edit/:id',
+      builder: (context, state) =>
+          LogAddScreen(editId: state.pathParameters['id']),
+    ),
+    GoRoute(
       path: '/bugs/add',
       builder: (context, state) => const BugAddScreen(),
+    ),
+    GoRoute(
+      path: '/bugs/edit/:id',
+      builder: (context, state) =>
+          BugAddScreen(editId: state.pathParameters['id']),
     ),
     GoRoute(
       path: '/settings',

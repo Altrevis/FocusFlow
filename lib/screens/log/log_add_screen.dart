@@ -5,7 +5,8 @@ import '../../core/constants/app_colors.dart';
 import '../../providers/log_provider.dart';
 
 class LogAddScreen extends ConsumerStatefulWidget {
-  const LogAddScreen({super.key});
+  final String? editId;
+  const LogAddScreen({super.key, this.editId});
 
   @override
   ConsumerState<LogAddScreen> createState() => _LogAddScreenState();
@@ -16,6 +17,19 @@ class _LogAddScreenState extends ConsumerState<LogAddScreen> {
   final _tagController = TextEditingController();
   final List<String> _tags = [];
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.editId != null) {
+      final entry = ref
+          .read(logProvider)
+          .entries
+          .firstWhere((e) => e.id == widget.editId);
+      _contentController.text = entry.content;
+      _tags.addAll(entry.tags);
+    }
+  }
 
   @override
   void dispose() {
@@ -37,7 +51,12 @@ class _LogAddScreenState extends ConsumerState<LogAddScreen> {
     if (content.isEmpty) return;
 
     setState(() => _saving = true);
-    await ref.read(logProvider.notifier).addEntry(content, _tags);
+    if (widget.editId != null) {
+      await ref.read(logProvider.notifier).updateEntry(
+            widget.editId!, content, _tags);
+    } else {
+      await ref.read(logProvider.notifier).addEntry(content, _tags);
+    }
     if (mounted) context.pop();
   }
 
@@ -45,8 +64,9 @@ class _LogAddScreenState extends ConsumerState<LogAddScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Nouveau log",
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+            widget.editId != null ? 'Modifier le log' : 'Nouveau log',
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           TextButton(
             onPressed: _saving ? null : _save,
