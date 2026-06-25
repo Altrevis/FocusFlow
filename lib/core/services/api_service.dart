@@ -32,6 +32,23 @@ class ApiService {
     }
   }
 
+  // Requêtes optimisées par tag pour cibler le contenu dev/programmation
+  static const _tagQueries = <String, String>{
+    'Flutter':    'flutter tutorial #flutter #flutterdevelopment #shorts',
+    'JavaScript': 'javascript coding #javascript #js #webdev #shorts',
+    'Python':     'python coding #python #pythonprogramming #coding #shorts',
+    'React':      'react tutorial #reactjs #react #webdev #shorts',
+    'TypeScript': 'typescript tutorial #typescript #ts #webdev #shorts',
+    'CSS':        'css tutorial #css #webdesign #frontend #shorts',
+    'Node.js':    'nodejs tutorial #nodejs #node #backend #shorts',
+    'Git':        'git tutorial #git #github #versioncontrol #shorts',
+    'Docker':     'docker tutorial #docker #devops #containerization #shorts',
+    'Linux':      'linux terminal tips #linux #bash #terminal #shorts',
+    'Backend':    'backend development #backend #api #coding #shorts',
+    'Frontend':   'frontend development #frontend #webdev #ui #shorts',
+    'DevOps':     'devops tutorial #devops #cicd #cloud #shorts',
+  };
+
   // YouTube Data API v3 — recherche de Shorts par tag
   // Doc : https://developers.google.com/youtube/v3/docs/search/list
   // Retourne les vidéos ET le nextPageToken pour la pagination
@@ -41,9 +58,10 @@ class ApiService {
     int maxResults = 25,
     String? pageToken,
   }) async {
+    final query = _tagQueries[tag] ?? '$tag programming tutorial #shorts';
     final params = <String, dynamic>{
       'part': 'snippet',
-      'q': '$tag #shorts',
+      'q': query,
       'type': 'video',
       'videoDuration': 'short',
       'maxResults': maxResults,
