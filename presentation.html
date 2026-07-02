@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusFlow – Présentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080810; --surface: #0f0f1a; --card: #13131f;
+      --glass: rgba(255,255,255,.04); --glass-b: rgba(255,255,255,.08);
+      --p: #7c3aed; --p2: #a855f7; --p3: #c084fc;
+      --c: #06b6d4; --c2: #22d3ee;
+      --g: #22c55e; --r: #ef4444; --y: #f59e0b;
+      --text: #f0f4ff; --muted: #7e8aa8; --dim: #3a3a5a;
+      --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --radius: 18px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 18px; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ── CANVAS ── */
+    #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0; transition: opacity .8s; }
+    body.on-cover #particles { opacity: 1; }
+
+    /* ── BLOBS ── */
+    .blob { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; animation: bf 9s ease-in-out infinite alternate; }
+    .b1 { width: 600px; height: 600px; background: rgba(124,58,237,.16); top: -150px; left: -100px; animation-delay: 0s; }
+    .b2 { width: 450px; height: 450px; background: rgba(6,182,212,.1);   bottom: -120px; right: -80px; animation-delay: -4s; }
+    .b3 { width: 350px; height: 350px; background: rgba(168,85,247,.08); top: 35%; left: 55%; animation-delay: -7s; }
+    @keyframes bf { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(40px,-25px) scale(1.1); } }
+
+    /* ── PROGRESS ── */
+    .progress-track { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,.05); z-index: 300; }
+    #progress { height: 100%; background: linear-gradient(90deg, var(--p), var(--c2)); transition: width .55s cubic-bezier(.4,0,.2,1); box-shadow: 0 0 14px rgba(124,58,237,.9), 0 0 28px rgba(6,182,212,.4); position: relative; }
+    #progress::after { content: ''; position: absolute; right: -1px; top: 50%; transform: translateY(-50%); width: 9px; height: 9px; border-radius: 50%; background: var(--c2); box-shadow: 0 0 14px var(--c2); }
+
+    /* ── SLIDE TITLE ── */
+    .slide-title { position: fixed; top: 0; left: 0; right: 0; padding: 16px 28px; font-size: .66rem; font-weight: 700; color: var(--dim); letter-spacing: .12em; text-transform: uppercase; z-index: 50; }
+
+    /* ── KBD HINT ── */
+    .kbd-hint { position: fixed; top: 17px; right: 28px; font-size: .66rem; color: var(--dim); z-index: 100; display: flex; gap: 5px; align-items: center; }
+    .kbd-hint kbd { background: var(--glass); border: 1px solid var(--glass-b); border-radius: 4px; padding: 1px 6px; font-family: inherit; font-size: .66rem; }
+
+    /* ── NAV ── */
+    .nav { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; align-items: center; z-index: 200; background: rgba(10,10,22,.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-b); border-radius: 100px; padding: 7px 14px; box-shadow: 0 8px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06); }
+    .nbtn { background: none; border: 1px solid var(--glass-b); color: var(--muted); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all .2s; line-height: 1; }
+    .nbtn:hover { background: var(--glass); color: var(--text); border-color: var(--p); box-shadow: 0 0 12px rgba(124,58,237,.3); }
+    .ndots { display: flex; gap: 5px; align-items: center; padding: 0 6px; }
+    .ndot { width: 6px; height: 6px; border-radius: 50%; background: var(--dim); cursor: pointer; transition: all .35s cubic-bezier(.4,0,.2,1); }
+    .ndot.active { width: 22px; border-radius: 3px; background: linear-gradient(90deg, var(--p), var(--c)); box-shadow: 0 0 10px rgba(124,58,237,.7); }
+    .ndot:hover:not(.active) { background: var(--muted); }
+    .ncnt { font-size: .72rem; color: var(--muted); min-width: 34px; text-align: center; font-weight: 700; letter-spacing: .04em; }
+
+    /* ── DECK & SLIDES ── */
+    .deck { width: 100vw; height: 100vh; position: relative; z-index: 1; }
+    .slide { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 54px 88px; opacity: 0; pointer-events: none; overflow: hidden; transform: translateX(70px) scale(.97); transition: opacity .55s cubic-bezier(.4,0,.2,1), transform .55s cubic-bezier(.4,0,.2,1); }
+    .slide.active { opacity: 1; transform: translateX(0) scale(1); pointer-events: all; }
+    .slide.exit   { opacity: 0; transform: translateX(-70px) scale(.97); }
+    .slide::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 42px 42px; pointer-events: none; }
+
+    /* stagger animations */
+    .slide.active .ac { animation: su .5s cubic-bezier(.4,0,.2,1) both; }
+    .slide.active .ac:nth-child(1){animation-delay:.04s}.slide.active .ac:nth-child(2){animation-delay:.11s}.slide.active .ac:nth-child(3){animation-delay:.18s}.slide.active .ac:nth-child(4){animation-delay:.25s}.slide.active .ac:nth-child(5){animation-delay:.32s}.slide.active .ac:nth-child(6){animation-delay:.39s}
+    @keyframes su { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── TYPE ── */
+    h1 { font-size: clamp(2.8rem,5.2vw,4.4rem); font-weight: 800; line-height: 1.08; letter-spacing: -.025em; }
+    h2 { font-size: clamp(1.8rem,3.2vw,2.7rem); font-weight: 800; line-height: 1.1; letter-spacing: -.02em; }
+    h3 { font-size: 1.14rem; font-weight: 700; margin-bottom: 4px; }
+    p  { color: var(--muted); line-height: 1.65; font-size: 1.04rem; }
+    .gt { background: linear-gradient(135deg, var(--p2), var(--c2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* ── TAGS ── */
+    .tag { display: inline-flex; align-items: center; background: rgba(124,58,237,.15); border: 1px solid rgba(124,58,237,.35); color: var(--p3); border-radius: 100px; padding: 4px 14px; font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+    .tag.g { background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.3); color: var(--g); }
+    .tag.r { background: rgba(239,68,68,.12);  border-color: rgba(239,68,68,.3);  color: var(--r); }
+    .tag.c { background: rgba(6,182,212,.12);  border-color: rgba(6,182,212,.3);  color: var(--c2); }
+    .tag.y { background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.3); color: var(--y); }
+
+    /* ── DIVIDER ── */
+    .div { width: 46px; height: 3px; background: linear-gradient(90deg, var(--p), var(--c)); border-radius: 100px; margin: 13px 0 21px; }
+
+    /* ── GLASS CARD ── */
+    .card { background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-b); border-radius: var(--radius); padding: 22px; transition: border-color .25s, box-shadow .25s; }
+    .card:hover { border-color: rgba(124,58,237,.35); box-shadow: 0 0 0 1px rgba(124,58,237,.1), 0 10px 36px rgba(0,0,0,.35); }
+
+    /* ── PHONE ── */
+    .phone { width: 200px; border-radius: 36px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); box-shadow: 0 0 0 1px rgba(255,255,255,.04), 0 32px 80px rgba(0,0,0,.75), 0 0 50px rgba(124,58,237,.18); flex-shrink: 0; animation: pf 4.5s ease-in-out infinite; }
+    .phone.d { animation-delay: -2.25s; }
+    .phone img { display: block; width: 100%; height: auto; }
+    .pr { display: flex; gap: 20px; align-items: flex-start; justify-content: center; }
+    .phone.tall  { width: 168px; margin-top: 32px; }
+    .phone.short { width: 168px; }
+    @keyframes pf { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    /* ── LAYOUTS ── */
+    .two-col { display: flex; gap: 68px; align-items: center; width: 100%; max-width: 1040px; }
+    .two-col .l { flex: 1; }
+    .two-col .r { flex-shrink: 0; }
+
+    /* ── FEAT LIST ── */
+    .flist { display: flex; flex-direction: column; gap: 11px; margin-top: 21px; }
+    .fitem { display: flex; align-items: center; gap: 14px; background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--glass-b); border-radius: 12px; padding: 12px 16px; transition: border-color .25s, transform .25s; }
+    .fitem:hover { border-color: rgba(124,58,237,.3); transform: translateX(4px); }
+    .fdot { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .fitem strong { display: block; font-size: .9rem; color: var(--text); margin-bottom: 1px; }
+    .fitem p { font-size: .81rem; }
+
+    /* ── PAIN LIST ── */
+    .plist { list-style: none; display: flex; flex-direction: column; gap: 11px; margin-top: 21px; }
+    .plist li { display: flex; align-items: flex-start; gap: 14px; background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--glass-b); border-radius: 13px; padding: 15px 19px; transition: border-color .25s, transform .25s; }
+    .plist li:hover { border-color: rgba(239,68,68,.3); transform: translateX(4px); }
+    .plist li .ico { font-size: 1.5rem; flex-shrink: 0; }
+    .plist li strong { display: block; font-size: .92rem; color: var(--text); margin-bottom: 2px; }
+    .plist li span { font-size: .82rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── SOL GRID ── */
+    .sgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 13px; max-width: 920px; width: 100%; }
+    .scard { background: var(--glass); backdrop-filter: blur(16px); border: 1px solid var(--glass-b); border-radius: 16px; padding: 22px 18px; text-align: left; transition: all .3s cubic-bezier(.4,0,.2,1); position: relative; overflow: hidden; }
+    .scard::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent); }
+    .scard:hover { border-color: rgba(124,58,237,.4); transform: translateY(-5px); box-shadow: 0 18px 44px rgba(0,0,0,.45), 0 0 0 1px rgba(124,58,237,.14); }
+    .scard.sp { background: linear-gradient(135deg, rgba(124,58,237,.12), rgba(6,182,212,.07)); border-color: rgba(124,58,237,.25); }
+    .scard .sic { font-size: 2rem; margin-bottom: 11px; display: inline-block; animation: iw 5s ease-in-out infinite; }
+    .scard:nth-child(2) .sic{animation-delay:-.6s}.scard:nth-child(3) .sic{animation-delay:-1.2s}.scard:nth-child(4) .sic{animation-delay:-1.8s}.scard:nth-child(5) .sic{animation-delay:-2.4s}.scard:nth-child(6) .sic{animation-delay:-3s}
+    @keyframes iw { 0%,88%,100%{transform:rotate(0)}91%{transform:rotate(-9deg)}95%{transform:rotate(7deg)} }
+    .scard h3 { font-size: .91rem; margin-bottom: 4px; }
+    .scard p  { font-size: .79rem; }
+
+    /* ── STREAK ── */
+    .streak { background: linear-gradient(135deg, rgba(124,58,237,.18), rgba(6,182,212,.08)); border: 1px solid rgba(124,58,237,.3); border-radius: 16px; padding: 19px 21px; margin-top: 20px; display: flex; align-items: center; gap: 17px; }
+    .streak .fire { font-size: 2.2rem; animation: fs 1.6s ease-in-out infinite; }
+    @keyframes fs { 0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.1) rotate(-5deg)} }
+    .streak .snum { font-size: 2.8rem; font-weight: 900; color: var(--p3); line-height: 1; }
+    .streak .slbl { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── STEP LIST ── */
+    .stlist { display: flex; flex-direction: column; gap: 11px; margin-top: 20px; }
+    .stitem { display: flex; align-items: flex-start; gap: 13px; }
+    .stnum { width: 27px; height: 27px; border-radius: 50%; background: linear-gradient(135deg, var(--p), var(--c)); color: white; display: flex; align-items: center; justify-content: center; font-size: .76rem; font-weight: 800; flex-shrink: 0; margin-top: 2px; box-shadow: 0 0 14px rgba(124,58,237,.5); }
+    .stitem strong { display: block; color: var(--text); font-size: .88rem; margin-bottom: 1px; }
+    .stitem p { font-size: .8rem; }
+
+    /* ── PILLS ── */
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 17px; }
+    .pill { background: var(--glass); backdrop-filter: blur(8px); border: 1px solid var(--glass-b); border-radius: 100px; padding: 5px 13px; font-size: .77rem; color: var(--muted); transition: all .2s; cursor: default; }
+    .pill:hover { border-color: var(--p); color: var(--text); }
+    .pill.on { background: linear-gradient(135deg, rgba(124,58,237,.25), rgba(6,182,212,.15)); border-color: rgba(124,58,237,.5); color: var(--p3); box-shadow: 0 0 12px rgba(124,58,237,.22); }
+
+    /* ── CHIPS ── */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 17px; }
+    .chip { background: var(--glass); backdrop-filter: blur(8px); border: 1px solid var(--glass-b); border-radius: 8px; padding: 5px 13px; font-size: .79rem; color: var(--muted); transition: all .2s; }
+    .chip:hover { border-color: rgba(6,182,212,.3); color: var(--c2); }
+
+    /* ── SETTINGS ── */
+    .slist { display: flex; flex-direction: column; gap: 11px; margin-top: 5px; }
+    .sitem { display: flex; align-items: center; gap: 16px; background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--glass-b); border-radius: 14px; padding: 15px 19px; transition: border-color .25s, transform .25s; }
+    .sitem:hover { border-color: rgba(124,58,237,.3); transform: translateX(4px); }
+    .sico { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, rgba(124,58,237,.2), rgba(6,182,212,.1)); border: 1px solid rgba(124,58,237,.25); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .sitem strong { display: block; font-size: .9rem; color: var(--text); margin-bottom: 1px; }
+    .sitem p { font-size: .79rem; }
+
+    /* ── TECH GRID ── */
+    .tgrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; max-width: 860px; width: 100%; }
+    .titem { background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--glass-b); border-radius: 14px; padding: 18px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all .3s cubic-bezier(.4,0,.2,1); position: relative; overflow: hidden; }
+    .titem::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(124,58,237,.08),transparent 60%); opacity: 0; transition: opacity .3s; }
+    .titem:hover { border-color: rgba(124,58,237,.4); transform: translateY(-5px); box-shadow: 0 14px 36px rgba(0,0,0,.45); }
+    .titem:hover::before { opacity: 1; }
+    .titem img { width: 34px; height: 34px; object-fit: contain; }
+    .titem .tn { font-size: .81rem; font-weight: 700; }
+    .titem .tr { font-size: .69rem; color: var(--muted); }
+
+    /* ── ARCHI ── */
+    .alayers { display: flex; flex-direction: column; gap: 9px; margin-top: 19px; }
+    .alayer { display: flex; align-items: center; gap: 13px; background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--glass-b); border-radius: 11px; padding: 12px 17px; border-left: 3px solid var(--p); transition: transform .25s; }
+    .alayer:hover { transform: translateX(4px); }
+    .alayer .aic { font-size: 1.15rem; width: 25px; text-align: center; flex-shrink: 0; }
+    .alayer strong { font-size: .87rem; display: block; color: var(--text); }
+    .alayer p { font-size: .77rem; }
+    .adiag { flex-shrink: 0; width: 310px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-b); border-radius: 20px; padding: 20px 17px; box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+    .adiag .albl { font-size: .63rem; color: var(--dim); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 13px; }
+    .arow { display: flex; align-items: center; gap: 8px; padding: 7px 11px; border-radius: 7px; margin-bottom: 4px; border: 1px solid var(--glass-b); color: var(--muted); font-size: .77rem; transition: border-color .2s, color .2s; }
+    .arow:hover { border-color: rgba(124,58,237,.3); color: var(--p3); }
+    .arow.hl { border-color: rgba(124,58,237,.28); color: var(--p3); }
+    .arow .ms { margin-left: auto; color: var(--dim); font-size: .68rem; }
+    .aarrow { text-align: center; color: var(--dim); font-size: .88rem; margin: 1px 0; }
+
+    /* ── PILLARS ── */
+    .pillars { display: grid; grid-template-columns: repeat(3,1fr); gap: 17px; max-width: 880px; width: 100%; margin-top: 8px; }
+    .pillar { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-b); border-radius: 20px; padding: 30px 22px; position: relative; overflow: hidden; transition: all .35s cubic-bezier(.4,0,.2,1); }
+    .pillar::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--p), var(--c)); transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.4,0,.2,1); }
+    .pillar:hover { border-color: rgba(124,58,237,.35); transform: translateY(-6px); box-shadow: 0 22px 54px rgba(0,0,0,.45); }
+    .pillar:hover::after { transform: scaleX(1); }
+    .pillar .pic { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+    .pillar h3 { font-size: 1.03rem; margin-bottom: 9px; }
+    .pillar p  { font-size: .81rem; }
+
+    /* ── KPIS ── */
+    .kpis { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .kpi { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-b); border-radius: 15px; padding: 18px 26px; min-width: 126px; position: relative; overflow: hidden; transition: all .3s; }
+    .kpi::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(124,58,237,.55), transparent); }
+    .kpi:hover { transform: translateY(-4px); border-color: rgba(124,58,237,.3); }
+    .kpi .kn { font-size: 2.1rem; font-weight: 900; color: var(--p3); line-height: 1; }
+    .kpi .kl { font-size: .72rem; color: var(--muted); margin-top: 4px; }
+
+    .cta { background: linear-gradient(135deg, var(--p), var(--c)); border: none; color: white; font-family: var(--font); font-size: .98rem; font-weight: 700; padding: 14px 44px; border-radius: 100px; cursor: pointer; box-shadow: 0 8px 32px rgba(124,58,237,.45); transition: transform .25s, box-shadow .25s; position: relative; overflow: hidden; }
+    .cta::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg,transparent, rgba(255,255,255,.15)); }
+    .cta:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 18px 52px rgba(124,58,237,.65), 0 0 44px rgba(6,182,212,.35); }
+
+    /* ── SLIDE BG TINTS ── */
+    #s1  { background: radial-gradient(ellipse 100% 80% at 50% 0%,   rgba(124,58,237,.22),transparent 65%); gap: 28px; }
+    #s2  { background: radial-gradient(ellipse 80%  60% at 8%  50%,  rgba(239,68,68,.1), transparent 60%); }
+    #s3  { background: radial-gradient(ellipse 80%  70% at 92% 100%, rgba(34,197,94,.1), transparent 60%); }
+    #s4  { background: radial-gradient(ellipse 70%  60% at 82% 28%,  rgba(124,58,237,.12),transparent 55%); }
+    #s5  { background: radial-gradient(ellipse 70%  60% at 18% 72%,  rgba(6,182,212,.1), transparent 55%); }
+    #s6  { background: radial-gradient(ellipse 70%  60% at 82% 70%,  rgba(245,158,11,.1),transparent 55%); }
+    #s7  { background: radial-gradient(ellipse 70%  60% at 18% 38%,  rgba(239,68,68,.1), transparent 55%); }
+    #s8  { background: radial-gradient(ellipse 70%  60% at 88% 50%,  rgba(168,85,247,.12),transparent 55%); }
+    #s8b { background: radial-gradient(ellipse 70%  60% at 14% 62%,  rgba(34,197,94,.08),transparent 55%); }
+    #s9  { background: radial-gradient(ellipse 90%  70% at 50% 110%, rgba(6,182,212,.14),transparent 60%); }
+    #s10 { background: radial-gradient(ellipse 70%  60% at 82% 18%,  rgba(124,58,237,.12),transparent 55%); }
+    #s11 { background: radial-gradient(ellipse 100% 70% at 50% 50%,  rgba(124,58,237,.09),rgba(6,182,212,.05) 50%,transparent 80%); }
+    #s12 { background: radial-gradient(ellipse 100% 80% at 50% 100%, rgba(124,58,237,.22),transparent 65%); }
+
+    /* ── COVER LOGO ── */
+    #s1 .logo-wrap { display: flex; align-items: center; gap: 16px; justify-content: center; margin-bottom: 5px; }
+    #s1 .logo-icon { width: 72px; height: 72px; background: linear-gradient(135deg, var(--p), var(--c)); border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 0 44px rgba(124,58,237,.7), 0 0 90px rgba(6,182,212,.35); animation: lp 3s ease-in-out infinite; }
+    @keyframes lp { 0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.1),0 0 44px rgba(124,58,237,.7),0 0 90px rgba(6,182,212,.35)}50%{box-shadow:0 0 0 1px rgba(255,255,255,.15),0 0 65px rgba(124,58,237,1),0 0 130px rgba(6,182,212,.55)} }
+    #s1 .brand { font-size: 3.2rem; font-weight: 900; letter-spacing: -.04em; }
+    #s1 .sub { font-size: 1.12rem; color: var(--muted); max-width: 520px; line-height: 1.55; text-align: center; }
+    #s1 .ctags { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    #s1 .meta { font-size: .76rem; color: var(--dim); letter-spacing: .06em; }
+    #s1 .scr { position: absolute; bottom: 85px; display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--dim); font-size: .68rem; letter-spacing: .1em; animation: bo 2.2s ease-in-out infinite; }
+    @keyframes bo { 0%,100%{transform:translateY(0)}50%{transform:translateY(7px)} }
+
+    /* info row */
+    .irow { display: flex; align-items: center; gap: 10px; }
+    .irow p { font-size: .83rem; }
+    .irow strong { color: var(--text); }
+
+    /* stat box */
+    .statbox { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-b); border-radius: 22px; padding: 34px 26px; text-align: center; width: 230px; box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+  
+#s10b {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 50% 50%,
+      rgba(124,58,237,.14),
+      rgba(6,182,212,.06) 50%,
+      transparent 80%
+    );
+}
+
+#s10c {
+  background:
+    radial-gradient(
+      ellipse 90% 70% at 50% 50%,
+      rgba(124,58,237,.14),
+      rgba(6,182,212,.05) 50%,
+      transparent 80%
+    );
+}
+
+</style>
+</head>
+<body class="on-cover">
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+<canvas id="particles"></canvas>
+
+<div class="progress-track"><div id="progress" style="width:7.7%"></div></div>
+<div class="slide-title" id="slideTitle"></div>
+<div class="kbd-hint"><kbd>←</kbd><kbd>→</kbd> naviguer</div>
+
+<div class="deck" id="deck">
+
+  <!-- S2 PROBLÈME -->
+  <div class="slide active" id="s2" data-title="Le problème">
+    <div class="two-col">
+      <div class="l">
+        <span class="tag r ac">Le problème</span>
+        <h2 class="ac" style="margin-top:13px;">Un développeur jongle avec<br/>trop d'outils éparpillés</h2>
+        <div class="div ac"></div>
+        <ul class="plist">
+          <li class="ac"><span class="ico">🌐</span><div><strong>L'infobésité</strong><span>Des dizaines d'onglets ouverts, des bookmarks jamais retrouvés, Stack Overflow en permanence.</span></div></li>
+          <li class="ac"><span class="ico">🐛</span><div><strong>Le même bug, résolu deux fois</strong><span>On résout un problème, on l'oublie, et on perd 2h à le chercher à nouveau 3 mois plus tard.</span></div></li>
+          <li class="ac"><span class="ico">📓</span><div><strong>Pas de journal de progression</strong><span>Difficile de mesurer ce qu'on apprend vraiment au quotidien, ni de rester motivé.</span></div></li>
+          <li class="ac"><span class="ico">📱</span><div><strong>Aucun outil mobile dédié</strong><span>Tout se passe sur PC. Le téléphone reste sous-utilisé pour apprendre en déplacement.</span></div></li>
+        </ul>
+      </div>
+      <div style="flex-shrink:0;" class="ac">
+        <div class="statbox">
+          <div style="font-size:4rem;">😤</div>
+          <p style="margin-top:14px;">Le dev moyen ouvre<br/><strong style="color:var(--r);font-size:1.5rem;font-weight:900;">5 outils<br/>différents</strong><br/>dans une seule journée.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S1 COVER -->
+  <div class="slide" id="s1" data-title="Introduction">
+    <div class="logo-wrap ac"><div class="logo-icon">🎯</div><span class="brand gt">FocusFlow</span></div>
+    <h1 class="ac" style="text-align:center;max-width:680px;">Le compagnon du<br/><span class="gt">développeur</span> au quotidien</h1>
+    <div class="ctags ac">
+      <span class="tag">Flutter</span>
+      <span class="tag c">Mobile</span>
+      <span class="tag g">Offline-First</span>
+      <span class="tag y">Open Source</span>
+    </div>
+    <p class="meta ac">Projet Ynov · Dev Mobile · 2026</p>
+    <div class="scr"><span>CLIC OU → POUR AVANCER</span><span>▼</span></div>
+  </div>
+
+  <!-- S3 SOLUTION -->
+  <div class="slide" id="s3" data-title="La solution">
+    <span class="tag g ac">La réponse</span>
+    <h2 class="ac" style="margin-top:13px;text-align:center;">FocusFlow centralise tout<br/>en <span class="gt">5 modules essentiels</span></h2>
+    <p class="ac" style="text-align:center;max-width:520px;">Une seule application. Un design épuré. Accessible même sans connexion.</p>
+    <div class="sgrid">
+      <div class="scard ac"><div class="sic">🏠</div><h3>Dashboard</h3><p>Vue d'ensemble, tip du jour, accès rapide à tout.</p></div>
+      <div class="scard ac"><div class="sic">📚</div><h3>Références</h3><p>Cheatsheets par technologie avec recherche instantanée.</p></div>
+      <div class="scard ac"><div class="sic">📝</div><h3>Journal</h3><p>Noter ce qu'on apprend chaque jour. Streak de progression.</p></div>
+      <div class="scard ac"><div class="sic">🐛</div><h3>Bugs & Solutions</h3><p>Sa propre base de données de bugs résolus.</p></div>
+      <div class="scard ac"><div class="sic">▶️</div><h3>Cours YouTube</h3><p>Shorts filtrés par technologie via l'API YouTube.</p></div>
+      <div class="scard sp ac"><div class="sic">🌐</div><h3>90% Offline</h3><p>Les données restent disponibles sans internet.</p></div>
+    </div>
+  </div>
+
+  <!-- S4 ACCUEIL -->
+  <div class="slide" id="s4" data-title="Démo · Accueil">
+    <div class="two-col">
+      <div class="l">
+        <span class="tag ac">Module 1</span>
+        <h2 class="ac" style="margin-top:13px;">L'accueil : votre tableau<br/>de bord personnel</h2>
+        <div class="div ac"></div>
+        <div class="flist">
+          <div class="fitem ac"><div class="fdot" style="background:rgba(124,58,237,.2);">🔥</div><div><strong>Streak journalier</strong><p>Chaque jour actif compte. Un compteur visible pour rester motivé.</p></div></div>
+          <div class="fitem ac"><div class="fdot" style="background:rgba(34,197,94,.15);">💡</div><div><strong>Citation tech du jour</strong><p>Récupérée automatiquement via l'API Quotable. Rafraîchissable en un tap.</p></div></div>
+          <div class="fitem ac"><div class="fdot" style="background:rgba(239,68,68,.15);">⚡</div><div><strong>Accès rapide</strong><p>3 raccourcis vers Références, Journal et Bugs. Tout en 1 tap.</p></div></div>
+          <div class="fitem ac"><div class="fdot" style="background:rgba(168,85,247,.15);">📊</div><div><strong>Résumé de l'activité</strong><p>Derniers logs et bugs résolus visibles immédiatement.</p></div></div>
+        </div>
+      </div>
+      <div class="r ac"><div class="phone"><img src="screen app mobile/page_accueil.png" alt="Accueil" /></div></div>
+    </div>
+  </div>
+
+  <!-- S5 RÉFÉRENCES -->
+  <div class="slide" id="s5" data-title="Démo · Références">
+    <div class="two-col">
+      <div class="r ac" style="flex-shrink:0;">
+        <div class="pr">
+          <div class="phone short"><img src="screen app mobile/page_reference.png" alt="Références" /></div>
+          <div class="phone tall d"><img src="screen app mobile/page_detail_reference.png" alt="Détail cheatsheet" /></div>
+        </div>
+      </div>
+      <div class="l">
+        <span class="tag c ac">Module 2</span>
+        <h2 class="ac" style="margin-top:13px;">Références &<br/>Cheatsheets</h2>
+        <div class="div ac"></div>
+        <p class="ac">Une bibliothèque complète de fiches techniques, toujours sous la main, avec coloration syntaxique du code.</p>
+        <div class="chips ac"><span class="chip">🐚 Bash</span><span class="chip">🎨 CSS</span><span class="chip">🐦 Dart</span><span class="chip">🐳 Docker</span><span class="chip">🐙 Git</span><span class="chip">🗄️ SQL</span><span class="chip">⚙️ Regex</span><span class="chip">📱 Flutter</span><span class="chip">🟨 JavaScript</span><span class="chip">+ plus...</span></div>
+        <div style="margin-top:17px;display:flex;flex-direction:column;gap:9px;" class="ac">
+          <div class="irow"><span style="font-size:1rem;">🔍</span><p><strong>Recherche instantanée</strong> par mot-clé ou tag</p></div>
+          <div class="irow"><span style="font-size:1rem;">⭐</span><p><strong>Favoris</strong> pour les fiches les plus utilisées</p></div>
+          <div class="irow"><span style="font-size:1rem;">✈️</span><p><strong>100 % offline</strong> — stocké localement sur l'appareil</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S6 JOURNAL -->
+  <div class="slide" id="s6" data-title="Démo · Journal">
+    <div class="two-col">
+      <div class="l">
+        <span class="tag y ac">Module 3</span>
+        <h2 class="ac" style="margin-top:13px;">Journal d'apprentissage —<br/>Votre progression visible</h2>
+        <div class="div ac"></div>
+        <p class="ac">Notez ce que vous avez appris aujourd'hui. En 30 secondes. Chaque entrée devient une preuve tangible de votre évolution.</p>
+        <div class="streak ac">
+          <div class="fire">🔥</div>
+          <div><div class="snum">∞</div><div class="slbl">jours consécutifs<br/>d'apprentissage</div></div>
+          <div style="flex:1;padding-left:15px;border-left:1px solid rgba(124,58,237,.25);">
+            <p style="font-size:.8rem;">La régularité est la compétence n°1 d'un bon développeur. FocusFlow la mesure pour vous.</p>
+          </div>
+        </div>
+        <div style="margin-top:15px;display:flex;flex-direction:column;gap:9px;" class="ac">
+          <div class="irow"><span style="font-size:1rem;">🏷️</span><p><strong>Tags par technologie</strong> — filtrage de l'historique</p></div>
+          <div class="irow"><span style="font-size:1rem;">🔎</span><p><strong>Recherche dans l'historique</strong> — retrouver une note précise</p></div>
+        </div>
+      </div>
+      <div class="r ac" style="flex-shrink:0;">
+        <div class="pr">
+          <div class="phone short"><img src="screen app mobile/page_log.png" alt="Journal" /></div>
+          <div class="phone tall d"><img src="screen app mobile/page_ecrire_log.png" alt="Nouveau log" /></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S7 BUGS -->
+  <div class="slide" id="s7" data-title="Démo · Bugs &amp; Solutions">
+    <div class="two-col">
+      <div class="r ac" style="flex-shrink:0;">
+        <div class="pr">
+          <div class="phone short"><img src="screen app mobile/page_detail_bug.png" alt="Bug résolu" /></div>
+          <div class="phone tall d"><img src="screen app mobile/page_ecrire_bug.png" alt="Nouveau bug" /></div>
+        </div>
+      </div>
+      <div class="l">
+        <span class="tag r ac">Module 4</span>
+        <h2 class="ac" style="margin-top:13px;">Bugs &amp; Solutions —<br/>Ne cherchez plus deux fois</h2>
+        <div class="div ac"></div>
+        <p class="ac">Votre mémoire externe de développeur. Chaque bug résolu devient une fiche consultable en 2 secondes.</p>
+        <div class="stlist ac">
+          <div class="stitem"><div class="stnum">1</div><div><strong>Titre du bug</strong><p>Ex: NullPointerException au démarrage, Widget rebuild infini…</p></div></div>
+          <div class="stitem"><div class="stnum">2</div><div><strong>Contexte</strong><p>Dans quelle situation est-ce que ça arrivait ?</p></div></div>
+          <div class="stitem"><div class="stnum">3</div><div><strong>Solution</strong><p>Comment vous l'avez résolu. La réponse est là pour toujours.</p></div></div>
+          <div class="stitem"><div class="stnum">4</div><div><strong>Tags &amp; Recherche</strong><p>Retrouvez n'importe quelle solution en full-text search.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S8 COURS -->
+  <div class="slide" id="s8" data-title="Démo · Cours pratiques">
+    <div class="two-col">
+      <div class="l">
+        <span class="tag ac">Module 5</span>
+        <h2 class="ac" style="margin-top:13px;">Cours pratiques —<br/>YouTube Shorts intégrés</h2>
+        <div class="div ac"></div>
+        <p class="ac">Des contenus courts, par technologie, directement dans l'app. Apprenez en 60 secondes, n'importe où.</p>
+        <p class="ac" style="margin-top:9px;font-size:.85rem;">Filtrez par ce qui vous intéresse :</p>
+        <div class="pills ac">
+          <span class="pill on">Flutter</span><span class="pill">JavaScript</span><span class="pill">Python</span><span class="pill">React</span><span class="pill">TypeScript</span><span class="pill">CSS</span><span class="pill">Node.js</span><span class="pill">Docker</span><span class="pill">Git</span><span class="pill">DevOps</span><span class="pill">Linux</span><span class="pill">Backend</span>
+        </div>
+        <div class="ac" style="margin-top:16px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid rgba(124,58,237,.25);border-radius:13px;padding:13px 17px;">
+          <p style="font-size:.81rem;"><strong style="color:var(--p3);">🔑 Clé API personnelle</strong><br/>Chaque utilisateur configure sa propre clé YouTube Data v3 dans les paramètres. Onboarding guidé pas à pas.</p>
+        </div>
+      </div>
+      <div class="r ac" style="flex-shrink:0;"><div class="phone" style="width:190px;"><img src="screen app mobile/page_youtbe_short.png" alt="Cours YouTube Shorts" /></div></div>
+    </div>
+  </div>
+
+  <!-- S9 PARAMÈTRES -->
+  <div class="slide" id="s8b" data-title="Démo · Paramètres">
+    <div class="two-col">
+      <div class="l">
+        <span class="tag g ac">Paramètres</span>
+        <h2 class="ac" style="margin-top:13px;">Simple, transparent,<br/>vous restez aux commandes</h2>
+        <div class="div ac"></div>
+        <div class="slist ac">
+          <div class="sitem"><div class="sico">🌙</div><div><strong>Mode sombre</strong><p>Activé par défaut pour préserver les yeux lors de longues sessions.</p></div></div>
+          <div class="sitem"><div class="sico">🔑</div><div><strong>Clé API YouTube</strong><p>Saisie, masquée, sauvegardée localement. Jamais envoyée ailleurs.</p></div></div>
+          <div class="sitem"><div class="sico">💾</div><div><strong>Données locales</strong><p>Compteur de logs et bugs enregistrés. Réinitialisation possible.</p></div></div>
+          <div class="sitem"><div class="sico">ℹ️</div><div><strong>Version 1.0.0</strong><p>FocusFlow — Le compagnon du développeur au quotidien.</p></div></div>
+        </div>
+      </div>
+      <div class="r ac" style="flex-shrink:0;"><div class="phone" style="width:200px;"><img src="screen app mobile/page_paramètre.png" alt="Paramètres" /></div></div>
+    </div>
+  </div>
+
+  <!-- S10 STACK -->
+  <div class="slide" id="s9" data-title="Stack technique" style="text-align:center;gap:20px;">
+    <span class="tag c ac">Sous le capot</span>
+    <h2 class="ac" style="margin-top:13px;">Une stack moderne,<br/><span class="gt">pensée pour durer</span></h2>
+    <div class="tgrid">
+      <div class="titem ac"><img src="https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png" alt="Flutter" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><div style="display:none;font-size:1.6rem;">📱</div><div class="tn">Flutter</div><div class="tr">Framework mobile</div></div>
+      <div class="titem ac"><img src="https://dart.dev/assets/img/logo/dart-256.png" alt="Dart" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><div style="display:none;font-size:1.6rem;">🎯</div><div class="tn">Dart</div><div class="tr">Langage de code</div></div>
+      <div class="titem ac"><div style="font-size:1.6rem;">🗃️</div><div class="tn">Hive</div><div class="tr">Stockage local</div></div>
+      <div class="titem ac"><div style="font-size:1.6rem;">⚡</div><div class="tn">Riverpod</div><div class="tr">État de l'app</div></div>
+      <div class="titem ac"><div style="font-size:1.6rem;">🌐</div><div class="tn">Dio</div><div class="tr">Appels API REST</div></div>
+      <div class="titem ac"><div style="font-size:1.6rem;">🗺️</div><div class="tn">GoRouter</div><div class="tr">Navigation</div></div>
+      <div class="titem ac"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/YouTube_play_buttom_icon_%282013-2017%29.svg" alt="YouTube" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><div style="display:none;font-size:1.6rem;">▶️</div><div class="tn">YouTube API v3</div><div class="tr">Vidéos en direct</div></div>
+      <div class="titem ac"><div style="font-size:1.6rem;">💬</div><div class="tn">Quotable API</div><div class="tr">Citations tech</div></div>
+    </div>
+  </div>
+
+
+   <!-- S13 POINTS FORTS -->
+  <!-- DÉMO PRODUIT -->
+  <div class="slide" id="s13demo" data-title="Démo produit" style="text-align:center;gap:30px;background:radial-gradient(ellipse 90% 70% at 50% 50%, rgba(124,58,237,.18),rgba(6,182,212,.08) 55%,transparent 80%);">
+    <span class="tag ac">Live</span>
+    <h1 class="ac" style="text-align:center;max-width:720px;">Je vais maintenant vous présenter<br/>le produit <span class="gt">FocusFlow</span></h1>
+    <p class="ac" style="max-width:540px;text-align:center;font-size:1rem;">Une démonstration des fonctionnalités principales,<br/>de l'expérience utilisateur et de la vision du projet.</p>
+    <div class="ctags ac" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+      <span class="tag">🏠 Dashboard</span>
+      <span class="tag c">📚 Références</span>
+      <span class="tag y">📝 Journal</span>
+      <span class="tag r">🐛 Bugs &amp; Solutions</span>
+      <span class="tag g">▶️ YouTube Shorts</span>
+    </div>
+  </div>
+
+  <!-- ROADMAP V1 → V2 -->
+  <div class="slide" id="s13road" data-title="Roadmap V1 → V2" style="text-align:center;gap:24px;background:radial-gradient(ellipse 80% 65% at 50% 100%, rgba(34,197,94,.1),rgba(124,58,237,.07) 55%,transparent 80%);">
+    <span class="tag g ac">Et après ?</span>
+    <h2 class="ac" style="text-align:center;margin-top:4px;">Ce qui est livré —<br/>Ce qui arrive en <span class="gt">V2</span></h2>
+    <div class="two-col ac" style="max-width:860px;gap:40px;align-items:flex-start;">
+      <div style="flex:1;background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-b);border-radius:20px;padding:26px 22px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span style="font-size:1.4rem;">✅</span><strong style="font-size:1rem;color:var(--text);">Version 1.0 — Disponible</strong></div>
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <div class="irow"><span style="font-size:1rem;">🏠</span><p>Dashboard personnalisé</p></div>
+          <div class="irow"><span style="font-size:1rem;">📚</span><p>Références & cheatsheets offline</p></div>
+          <div class="irow"><span style="font-size:1rem;">📝</span><p>Journal d'apprentissage avec streak</p></div>
+          <div class="irow"><span style="font-size:1rem;">🐛</span><p>Base de bugs & solutions</p></div>
+          <div class="irow"><span style="font-size:1rem;">▶️</span><p>Cours YouTube Shorts intégrés</p></div>
+          <div class="irow"><span style="font-size:1rem;">🌐</span><p>90 % offline (Hive)</p></div>
+        </div>
+      </div>
+      <div style="flex:1;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(6,182,212,.07));backdrop-filter:blur(16px);border:1px solid rgba(124,58,237,.3);border-radius:20px;padding:26px 22px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><span style="font-size:1.4rem;">🚀</span><strong style="font-size:1rem;color:var(--p3);">Version 2.0 — En route</strong></div>
+        <div style="display:flex;flex-direction:column;gap:9px;text-align:left;">
+          <div class="irow" style="align-items:flex-start;"><span style="font-size:1rem;margin-top:2px;flex-shrink:0;">👥</span><p><strong style="color:var(--text);">Mode réseau social</strong> — partager, commenter, suivre d'autres devs</p></div>
+          <div class="irow" style="align-items:flex-start;"><span style="font-size:1rem;margin-top:2px;flex-shrink:0;">🤖</span><p><strong style="color:var(--text);">IA pour Bugs & Solutions</strong> — suggestions automatiques, analyse du contexte</p></div>
+          <div class="irow" style="align-items:flex-start;"><span style="font-size:1rem;margin-top:2px;flex-shrink:0;">🔔</span><p><strong style="color:var(--text);">Notifications push</strong> — rappels d'apprentissage, streak en danger</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="slide" id="s12" data-title="Conclusion" style="text-align:center;gap:20px;">
+    <span class="tag g ac">En résumé</span>
+    <h1 class="ac" style="text-align:center;margin-top:7px;"><span class="gt">FocusFlow</span></h1>
+    <p class="ac" style="font-size:clamp(1.2rem,2.2vw,1.7rem);font-weight:700;max-width:560px;line-height:1.3;color:var(--text);">"Le carnet de bord intelligent<br/>du développeur moderne."</p>
+    <div class="kpis ac">
+      <div class="kpi"><div class="kn">5</div><div class="kl">Modules complets</div></div>
+      <div class="kpi"><div class="kn">90%</div><div class="kl">Offline-capable</div></div>
+      <div class="kpi"><div class="kn">2</div><div class="kl">API intégrées</div></div>
+      <div class="kpi"><div class="kn">1</div><div class="kl">App. Une seule.</div></div>
+    </div>
+    <p class="ac" style="max-width:460px;text-align:center;font-size:.86rem;">Conçu avec Flutter · Stockage local Hive · Propulsé par YouTube &amp; Quotable API<br/>Prêt pour les stores · Version 1.0.0</p>
+    <button class="cta ac" onclick="goTo(0)">🎯 Des questions ?</button>
+    <div class="ac" style="display:flex;gap:11px;align-items:center;margin-top:2px;">
+      <img src="https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png" style="height:17px;opacity:.3;" onerror="this.style.display='none'" />
+      <span style="color:var(--dim);font-size:.74rem;letter-spacing:.04em;">Built with Flutter by Altrevis / FocusFlow · 2026</span>
+    </div>
+  </div>
+
+</div><!-- /.deck -->
+
+<div class="nav">
+  <button class="nbtn" onclick="prev()">‹</button>
+  <div class="ndots" id="navDots"></div>
+  <span class="ncnt" id="counter"></span>
+  <button class="nbtn" onclick="next()">›</button>
+  <button class="nbtn" id="fsBtn" onclick="toggleFullscreen()" title="Plein écran (F)">⛶</button>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const TITLES = slides.map(s => s.dataset.title || '');
+  let current = 0;
+
+  // Build dots
+  const dotsEl = document.getElementById('navDots');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'ndot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(n) {
+    if (n === current) return;
+    const prev = slides[current];
+    current = Math.max(0, Math.min(n, slides.length - 1));
+    prev.classList.remove('active');
+    prev.classList.add('exit');
+    setTimeout(() => prev.classList.remove('exit'), 600);
+    const next = slides[current];
+    next.classList.add('active');
+    // Re-trigger stagger animations
+    next.querySelectorAll('.ac').forEach(el => {
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation = '';
+    });
+    updateUI();
+    document.body.classList.toggle('on-cover', current === 0);
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  function updateUI() {
+    const pct = ((current + 1) / slides.length * 100).toFixed(1);
+    document.getElementById('progress').style.width = pct + '%';
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length;
+    document.getElementById('slideTitle').textContent = TITLES[current];
+    document.querySelectorAll('.ndot').forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')  { e.preventDefault(); prev(); }
+    if (e.key === 'Home') goTo(0);
+    if (e.key === 'End')  goTo(slides.length - 1);
+    if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleFullscreen(); }
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  document.addEventListener('fullscreenchange', () => {
+    const btn = document.getElementById('fsBtn');
+    if (!btn) return;
+    btn.textContent = document.fullscreenElement ? '⤢' : '⛶';
+    btn.title = document.fullscreenElement ? 'Quitter le plein écran (F)' : 'Plein écran (F)';
+  });
+
+  document.getElementById('deck').addEventListener('click', e => {
+    if (!e.target.closest('.nav') && !e.target.closest('button')) next();
+  });
+
+  let tx = 0, ty = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    const dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 48) dx < 0 ? next() : prev();
+  });
+
+  // Particle canvas
+  (function() {
+    const cvs = document.getElementById('particles');
+    const ctx = cvs.getContext('2d');
+    let W, H, pts = [];
+
+    function resize() { W = cvs.width = innerWidth; H = cvs.height = innerHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function Pt() {
+      this.reset = function() {
+        this.x = Math.random() * W; this.y = Math.random() * H;
+        this.r = Math.random() * 1.4 + .3;
+        this.vx = (Math.random() - .5) * .28; this.vy = (Math.random() - .5) * .28;
+        this.a = Math.random() * .45 + .08;
+        this.col = Math.random() > .5 ? '124,58,237' : '6,182,212';
+      };
+      this.reset();
+      this.update = function() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset(); };
+      this.draw = function() { ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fillStyle='rgba('+this.col+','+this.a+')'; ctx.fill(); };
+    }
+    for (let i = 0; i < 110; i++) pts.push(new Pt());
+
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < pts.length; i++) {
+        pts[i].update(); pts[i].draw();
+        for (let j = i+1; j < pts.length; j++) {
+          const dx = pts[i].x-pts[j].x, dy = pts[i].y-pts[j].y, d = Math.sqrt(dx*dx+dy*dy);
+          if (d < 115) { ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.strokeStyle='rgba(124,58,237,'+(0.07*(1-d/115))+')'; ctx.lineWidth=.45; ctx.stroke(); }
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
+  updateUI();
+</script>
+</body>
+</html>
